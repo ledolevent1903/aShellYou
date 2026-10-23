@@ -16,7 +16,7 @@ jobs:
           fetch-depth: 0
 
       - name: Java 17 Kur
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
           java-version: '17'
@@ -24,12 +24,15 @@ jobs:
       - name: Calistirma Yetkisi Ver
         run: chmod +x gradlew
 
-      - name: Sadece Ana APKyi Derle
-        run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
+      - name: APKyi Derle
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Uretilen APKlari Bul ve Listele
+        run: find . -name "*.apk"
 
       - name: APK Yukle
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: aShellYou-WifiButonlu
-          path: app/build/outputs/apk/debug/*.apk
+          path: "**/*.apk"
