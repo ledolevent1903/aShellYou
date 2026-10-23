@@ -695,9 +695,10 @@ fun BaseShellScreen(
                                     androidx.compose.material3.Button(
                                         modifier = Modifier.weight(1f),
                                         onClick = {
-                                            try {
-                                                rikka.shizuku.Shizuku.newProcess(arrayOf("sh", "-c", "svc wifi enable"), null, null)
-                                            } catch (e: Exception) { }
+                                            shellViewModel.onCommandTextFieldChange(
+                                                androidx.compose.ui.text.input.TextFieldValue("svc wifi enable")
+                                            )
+                                            actionFabOnClick()
                                         }
                                     ) {
                                         androidx.compose.material3.Text("Wi-Fi Aç")
@@ -705,9 +706,10 @@ fun BaseShellScreen(
                                     androidx.compose.material3.Button(
                                         modifier = Modifier.weight(1f),
                                         onClick = {
-                                            try {
-                                                rikka.shizuku.Shizuku.newProcess(arrayOf("sh", "-c", "svc wifi disable"), null, null)
-                                            } catch (e: Exception) { }
+                                            shellViewModel.onCommandTextFieldChange(
+                                                androidx.compose.ui.text.input.TextFieldValue("svc wifi disable")
+                                            )
+                                            actionFabOnClick()
                                         }
                                     ) {
                                         androidx.compose.material3.Text("Wi-Fi Kapat")
@@ -720,9 +722,10 @@ fun BaseShellScreen(
                                     androidx.compose.material3.Button(
                                         modifier = Modifier.weight(1f),
                                         onClick = {
-                                            try {
-                                                rikka.shizuku.Shizuku.newProcess(arrayOf("sh", "-c", "settings put global wifi_on 1"), null, null)
-                                            } catch (e: Exception) { }
+                                            shellViewModel.onCommandTextFieldChange(
+                                                androidx.compose.ui.text.input.TextFieldValue("settings put global wifi_on 1")
+                                            )
+                                            actionFabOnClick()
                                         }
                                     ) {
                                         androidx.compose.material3.Text("Global Aç")
@@ -730,9 +733,10 @@ fun BaseShellScreen(
                                     androidx.compose.material3.Button(
                                         modifier = Modifier.weight(1f),
                                         onClick = {
-                                            try {
-                                                rikka.shizuku.Shizuku.newProcess(arrayOf("sh", "-c", "settings put global wifi_scan_always_enabled 1"), null, null)
-                                            } catch (e: Exception) { }
+                                            shellViewModel.onCommandTextFieldChange(
+                                                androidx.compose.ui.text.input.TextFieldValue("settings put global wifi_scan_always_enabled 1")
+                                            )
+                                            actionFabOnClick()
                                         }
                                     ) {
                                         androidx.compose.material3.Text("Tarama Aç")
