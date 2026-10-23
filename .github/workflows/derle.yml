@@ -9,7 +9,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Kodlari ve Alt Modulleri Cek
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
 
       - name: Java 17 Kur
         uses: actions/setup-java@v4
@@ -17,13 +21,14 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Yetki Ver
+      - name: Calistirma Yetkisi Ver
         run: chmod +x gradlew
 
-      - name: APK Derle
-        run: ./gradlew assembleDebug --stacktrace
+      - name: Sadece Ana APKyi Derle
+        run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
 
       - name: APK Yukle
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: aShellYou-WifiButonlu
