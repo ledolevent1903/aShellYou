@@ -698,6 +698,7 @@ fun BaseShellScreen(
                                             shellViewModel.onCommandTextFieldChange(
                                                 androidx.compose.ui.text.input.TextFieldValue("svc wifi enable")
                                             )
+                                            shellViewModel.updateTextFieldSelection()
                                             actionFabOnClick()
                                         }
                                     ) {
@@ -709,6 +710,7 @@ fun BaseShellScreen(
                                             shellViewModel.onCommandTextFieldChange(
                                                 androidx.compose.ui.text.input.TextFieldValue("svc wifi disable")
                                             )
+                                            shellViewModel.updateTextFieldSelection()
                                             actionFabOnClick()
                                         }
                                     ) {
@@ -725,6 +727,7 @@ fun BaseShellScreen(
                                             shellViewModel.onCommandTextFieldChange(
                                                 androidx.compose.ui.text.input.TextFieldValue("settings put global wifi_on 1")
                                             )
+                                            shellViewModel.updateTextFieldSelection()
                                             actionFabOnClick()
                                         }
                                     ) {
@@ -736,6 +739,7 @@ fun BaseShellScreen(
                                             shellViewModel.onCommandTextFieldChange(
                                                 androidx.compose.ui.text.input.TextFieldValue("settings put global wifi_scan_always_enabled 1")
                                             )
+                                            shellViewModel.updateTextFieldSelection()
                                             actionFabOnClick()
                                         }
                                     ) {
