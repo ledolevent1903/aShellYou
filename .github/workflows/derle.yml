@@ -1,0 +1,30 @@
+name: aShellYou APK Derle
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Java 17 Kur
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Yetki Ver
+        run: chmod +x gradlew
+
+      - name: APK Derle
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: APK Yukle
+        uses: actions/upload-artifact@v4
+        with:
+          name: aShellYou-WifiButonlu
+          path: app/build/outputs/apk/debug/*.apk
