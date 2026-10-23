@@ -681,7 +681,61 @@ fun BaseShellScreen(
                                     content = actionFabIcon
                                 )
                             }
-
+// --- HIZLI KOMUT BUTONLARI ---
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Button(
+                                        modifier = Modifier.weight(1f),
+                                        onClick = {
+                                            shellViewModel.onCommandTextFieldChange(androidx.compose.ui.text.input.TextFieldValue("svc wifi enable"))
+                                            actionFabOnClick()
+                                        }
+                                    ) {
+                                        Text("Wi-Fi Aç")
+                                    }
+                                    Button(
+                                        modifier = Modifier.weight(1f),
+                                        onClick = {
+                                            shellViewModel.onCommandTextFieldChange(androidx.compose.ui.text.input.TextFieldValue("svc wifi disable"))
+                                            actionFabOnClick()
+                                        }
+                                    ) {
+                                        Text("Wi-Fi Kapat")
+                                    }
+                                }
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Button(
+                                        modifier = Modifier.weight(1f),
+                                        onClick = {
+                                            shellViewModel.onCommandTextFieldChange(androidx.compose.ui.text.input.TextFieldValue("settings put global wifi_on 1"))
+                                            actionFabOnClick()
+                                        }
+                                    ) {
+                                        Text("Global Aç")
+                                    }
+                                    Button(
+                                        modifier = Modifier.weight(1f),
+                                        onClick = {
+                                            shellViewModel.onCommandTextFieldChange(androidx.compose.ui.text.input.TextFieldValue("settings put global wifi_scan_always_enabled 1"))
+                                            actionFabOnClick()
+                                        }
+                                    ) {
+                                        Text("Tarama Aç")
+                                    }
+                                }
+                            }
+                            // ------------------------------
                             if (states.commandField.fieldValue.text.isNotEmpty() && !states.search.isVisible) {
                                 Suggestions(
                                     modifier = Modifier.fillMaxWidth(),
