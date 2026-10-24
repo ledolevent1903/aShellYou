@@ -28,7 +28,7 @@ jobs:
         run: |
           keytool -genkey -v -keystore release.keystore -alias android -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Android, OU=Android, O=Android, L=US, S=CA, C=US"
 
-      - name: Release APK Derle (R8 Optimizasyonlu)
+      - name: Release APK Derle
         env:
           KEYSTORE_FILE: release.keystore
           KEYSTORE_PATH: release.keystore
@@ -49,11 +49,22 @@ jobs:
             -Pandroid.injected.signing.key.password=android \
             --no-daemon
 
-      - name: Sadece ARM64 APKyi Sec ve Yukle
+      - name: Sadece Chery Omoda 5 Icin Tek ARM64 APKyi Ayikla
+        run: |
+          mkdir -p final_apk
+          # Klasör içindeki mimarileri listele ve arm64 olan tek APK'yı taşı
+          ARM64_FILE=$(find app/build/outputs/apk/github/release -name "*arm64*.apk" | head -n 1)
+          if [ -n "$ARM64_FILE" ]; then
+            cp "$ARM64_FILE" final_apk/aShellYou-Chery-arm64.apk
+          else
+            # Eğer mimari bölünmediyse üretilen tek release APK'sını al
+            REL_FILE=$(find app/build/outputs/apk/github/release -name "*.apk" | head -n 1)
+            cp "$REL_FILE" final_apk/aShellYou-Chery-arm64.apk
+          fi
+          ls -lh final_apk/
+
+      - name: Sadece 10 MB Tek APKyi Yukle
         uses: actions/upload-artifact@v4
         with:
-          name: aShellYou-WifiButonlu-10MB
-          path: |
-            app/build/outputs/apk/github/release/*arm64*.apk
-            app/build/outputs/apk/github/release/*release*.apk
-          if-no-files-found: warn
+          name: aShellYou-Chery-Tek-APK
+          path: final_apk/aShellYou-Chery-arm64.apk
