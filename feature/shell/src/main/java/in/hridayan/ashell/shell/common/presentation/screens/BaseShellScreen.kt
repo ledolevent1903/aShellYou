@@ -799,7 +799,7 @@ fun BaseShellScreen(
                                     }
                                 }
                             }
-                            // ------------------------------------------------------
+                            // ----------------------------------------------------------
                             if (states.commandField.fieldValue.text.isNotEmpty() && !states.search.isVisible) {
                                 Suggestions(
                                     modifier = Modifier.fillMaxWidth(),
