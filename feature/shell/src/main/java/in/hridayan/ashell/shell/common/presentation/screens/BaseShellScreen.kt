@@ -681,13 +681,14 @@ fun BaseShellScreen(
                                     content = actionFabIcon
                                 )
                             }
-// --- HIZLI KOMUT BUTONLARI ---
+// --- HIZLI KOMUT BUTONLARI (WI-FI & GLOBAL AYARLAR) ---
                             androidx.compose.foundation.layout.Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(vertical = 8.dp),
                                 verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)
                             ) {
+                                // 1. Satır: Wi-Fi Aç & Wi-Fi Kapat
                                 androidx.compose.foundation.layout.Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)
@@ -723,6 +724,8 @@ fun BaseShellScreen(
                                         androidx.compose.material3.Text("Wi-Fi Kapat")
                                     }
                                 }
+
+                                // 2. Satır: wifi_on 1 & wifi_saved_state 1
                                 androidx.compose.foundation.layout.Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)
@@ -740,8 +743,30 @@ fun BaseShellScreen(
                                             }
                                         }
                                     ) {
-                                        androidx.compose.material3.Text("Global Aç")
+                                        androidx.compose.material3.Text("Global wifi_on")
                                     }
+                                    androidx.compose.material3.Button(
+                                        modifier = Modifier.weight(1f),
+                                        onClick = {
+                                            shellViewModel.onCommandTextFieldChange(
+                                                androidx.compose.ui.text.input.TextFieldValue("settings put global wifi_saved_state 1")
+                                            )
+                                            coroutineScope.launch {
+                                                if (isKeyboardVisible) hideKeyboard(context)
+                                                awaitFrame()
+                                                runCommandIfPermissionGranted()
+                                            }
+                                        }
+                                    ) {
+                                        androidx.compose.material3.Text("Saved State 1")
+                                    }
+                                }
+
+                                // 3. Satır: wifi_scan_always_enabled 1 & wifi_sleep_policy 2
+                                androidx.compose.foundation.layout.Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)
+                                ) {
                                     androidx.compose.material3.Button(
                                         modifier = Modifier.weight(1f),
                                         onClick = {
@@ -755,11 +780,26 @@ fun BaseShellScreen(
                                             }
                                         }
                                     ) {
-                                        androidx.compose.material3.Text("Tarama Aç")
+                                        androidx.compose.material3.Text("Sürekli Tarama")
+                                    }
+                                    androidx.compose.material3.Button(
+                                        modifier = Modifier.weight(1f),
+                                        onClick = {
+                                            shellViewModel.onCommandTextFieldChange(
+                                                androidx.compose.ui.text.input.TextFieldValue("settings put global wifi_sleep_policy 2")
+                                            )
+                                            coroutineScope.launch {
+                                                if (isKeyboardVisible) hideKeyboard(context)
+                                                awaitFrame()
+                                                runCommandIfPermissionGranted()
+                                            }
+                                        }
+                                    ) {
+                                        androidx.compose.material3.Text("Uyku Politikası 2")
                                     }
                                 }
                             }
-                            // ------------------------------
+                            // ------------------------------------------------------
                             if (states.commandField.fieldValue.text.isNotEmpty() && !states.search.isVisible) {
                                 Suggestions(
                                     modifier = Modifier.fillMaxWidth(),
