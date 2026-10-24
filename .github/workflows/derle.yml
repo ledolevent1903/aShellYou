@@ -49,30 +49,31 @@ jobs:
             -Pandroid.injected.signing.store.password=android \
             -Pandroid.injected.signing.key.alias=androidreleasekey \
             -Pandroid.injected.signing.key.password=android \
-            -Pandroid.injected.build.abi=arm64-v8a \
             -x lint -x lintAnalyzeRelease -x lintVitalAnalyzeRelease \
             --no-daemon
 
-      - name: Sadece 10 MB ARM64 Release APKyi Ayikla
+      - name: Universal Olanlari Ele ve Sadece ARM64 Sec
         run: |
           mkdir -p cikti
-          echo "=== Tum Uretilen APKlar ==="
-          find . -name "*.apk" -type f
+          echo "=== Tum Uretilen APK Dosyalari ve Boyutlari ==="
+          ls -lh $(find . -name "*.apk" -type f)
           
-          # github release klasorundeki arm64 veya genel release apk'sini sec
-          HEDEF_APK=$(find . -path "*github*release*" -name "*.apk" -type f | head -n 1)
-          if [ -z "$HEDEF_APK" ]; then
-            HEDEF_APK=$(find . -name "*release*.apk" -type f | head -n 1)
+          # Oncelikle isminde acikca 'arm64' gecen release dosyasini ara
+          ARM64_APK=$(find . -name "*arm64*.apk" -type f | grep -v "universal" | head -n 1)
+          
+          # Eger ozel isimlendirilmemisse boyutu en kucuk olan release apk'sini sec (95 MB olan universal elensin)
+          if [ -z "$ARM64_APK" ]; then
+            ARM64_APK=$(find . -name "*release*.apk" -type f | grep -v "universal" | head -n 1)
           fi
           
-          echo "Secilen Hedef APK: $HEDEF_APK"
-          cp "$HEDEF_APK" cikti/aShellYou-Chery-Omoda5-10MB.apk
+          echo ">>> Secilen Kucuk Boyutlu APK: $ARM64_APK"
+          cp "$ARM64_APK" cikti/aShellYou-Chery-Omoda5-11MB.apk
           
-          echo "=== Nihai Dosya Boyutu ==="
-          ls -lh cikti/aShellYou-Chery-Omoda5-10MB.apk
+          echo "=== Yuklenecek Nihai Dosya ==="
+          ls -lh cikti/aShellYou-Chery-Omoda5-11MB.apk
 
-      - name: 10 MB APKyi Yukle
+      - name: 11 MB APKyi Yukle
         uses: actions/upload-artifact@v4
         with:
-          name: aShellYou-Chery-10MB
-          path: cikti/aShellYou-Chery-Omoda5-10MB.apk
+          name: aShellYou-Chery-11MB
+          path: cikti/aShellYou-Chery-Omoda5-11MB.apk
