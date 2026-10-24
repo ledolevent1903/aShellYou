@@ -24,11 +24,20 @@ jobs:
       - name: Gradle Calistirma Yetkisi Ver
         run: chmod +x gradlew
 
-      - name: Optimize ARM64 APK Derle
-        run: ./gradlew assembleGithubDebug -Pandroid.injected.build.abi=arm64-v8a --no-daemon
+      - name: Release APK Derle (R8 Optimizasyonlu)
+        run: ./gradlew assembleGithubRelease --no-daemon
 
-      - name: APKyi Yukle
+      - name: Android SDK Build-Tools Kur
+        run: sudo apt-get install -y apksigner
+
+      - name: Test Anahtari Olustur ve Imzala
+        run: |
+          keytool -genkey -v -keystore test.keystore -alias test -keyalg RSA -keysize 2048 -validity 10000 -storepass 123456 -keypass 123456 -dname "CN=aShellYou, OU=App, O=Mod, L=TR, S=TR, C=TR"
+          APK_PATH=$(find app/build/outputs/apk/github/release -name "*.apk" | head -n 1)
+          apksigner sign --ks test.keystore --ks-pass pass:123456 --key-pass pass:123456 --out app/build/outputs/apk/aShellYou-Chery-Opt.apk "$APK_PATH"
+
+      - name: Kucuk Boyutlu APKyi Yukle
         uses: actions/upload-artifact@v4
         with:
-          name: aShellYou-WifiButonlu-KucukBoyut
-          path: app/build/outputs/apk/**/*.apk
+          name: aShellYou-WifiButonlu-10MB
+          path: app/build/outputs/apk/aShellYou-Chery-Opt.apk
