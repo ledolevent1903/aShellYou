@@ -24,20 +24,36 @@ jobs:
       - name: Gradle Calistirma Yetkisi Ver
         run: chmod +x gradlew
 
-      - name: Release APK Derle (R8 Optimizasyonlu)
-        run: ./gradlew assembleGithubRelease --no-daemon
-
-      - name: Android SDK Build-Tools Kur
-        run: sudo apt-get install -y apksigner
-
-      - name: Test Anahtari Olustur ve Imzala
+      - name: Imza Anahtari (Keystore) Olustur
         run: |
-          keytool -genkey -v -keystore test.keystore -alias test -keyalg RSA -keysize 2048 -validity 10000 -storepass 123456 -keypass 123456 -dname "CN=aShellYou, OU=App, O=Mod, L=TR, S=TR, C=TR"
-          APK_PATH=$(find app/build/outputs/apk/github/release -name "*.apk" | head -n 1)
-          apksigner sign --ks test.keystore --ks-pass pass:123456 --key-pass pass:123456 --out app/build/outputs/apk/aShellYou-Chery-Opt.apk "$APK_PATH"
+          keytool -genkey -v -keystore release.keystore -alias android -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Android, OU=Android, O=Android, L=US, S=CA, C=US"
 
-      - name: Kucuk Boyutlu APKyi Yukle
+      - name: Release APK Derle (R8 Optimizasyonlu)
+        env:
+          KEYSTORE_FILE: release.keystore
+          KEYSTORE_PATH: release.keystore
+          KEYSTORE_PASSWORD: android
+          KEY_ALIAS: android
+          KEY_PASSWORD: android
+          STORE_FILE: release.keystore
+          STORE_PASSWORD: android
+          RELEASE_KEYSTORE: release.keystore
+          RELEASE_KEYSTORE_PASSWORD: android
+          RELEASE_KEY_ALIAS: android
+          RELEASE_KEY_PASSWORD: android
+        run: |
+          ./gradlew assembleGithubRelease \
+            -Pandroid.injected.signing.store.file=$(pwd)/release.keystore \
+            -Pandroid.injected.signing.store.password=android \
+            -Pandroid.injected.signing.key.alias=android \
+            -Pandroid.injected.signing.key.password=android \
+            --no-daemon
+
+      - name: Sadece ARM64 APKyi Sec ve Yukle
         uses: actions/upload-artifact@v4
         with:
           name: aShellYou-WifiButonlu-10MB
-          path: app/build/outputs/apk/aShellYou-Chery-Opt.apk
+          path: |
+            app/build/outputs/apk/github/release/*arm64*.apk
+            app/build/outputs/apk/github/release/*release*.apk
+          if-no-files-found: warn
