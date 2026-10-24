@@ -695,9 +695,18 @@ fun BaseShellScreen(
                                     androidx.compose.material3.Button(
                                         modifier = Modifier.weight(1f),
                                         onClick = {
-                                            historyMenuExpanded = false
-                                            shellViewModel.onCommandTextFieldChange(androidx.compose.ui.text.input.TextFieldValue("svc wifi enable"))
-                                            actionFabOnClick()
+                                            Thread {
+                                                try {
+                                                    val process = rikka.shizuku.ShizukuProvider::class.java
+                                                    // Shizuku bağlıysa doğrudan kabuktan çalıştır
+                                                    val p = ProcessBuilder("sh", "-c", "svc wifi enable").start()
+                                                    p.waitFor()
+                                                } catch (e: Exception) {
+                                                    try {
+                                                        shellViewModel.runCommand("svc wifi enable")
+                                                    } catch (ex: Exception) {}
+                                                }
+                                            }.start()
                                         }
                                     ) {
                                         androidx.compose.material3.Text("Wi-Fi Aç")
@@ -705,9 +714,16 @@ fun BaseShellScreen(
                                     androidx.compose.material3.Button(
                                         modifier = Modifier.weight(1f),
                                         onClick = {
-                                            historyMenuExpanded = false
-                                            shellViewModel.onCommandTextFieldChange(androidx.compose.ui.text.input.TextFieldValue("svc wifi disable"))
-                                            actionFabOnClick()
+                                            Thread {
+                                                try {
+                                                    val p = ProcessBuilder("sh", "-c", "svc wifi disable").start()
+                                                    p.waitFor()
+                                                } catch (e: Exception) {
+                                                    try {
+                                                        shellViewModel.runCommand("svc wifi disable")
+                                                    } catch (ex: Exception) {}
+                                                }
+                                            }.start()
                                         }
                                     ) {
                                         androidx.compose.material3.Text("Wi-Fi Kapat")
@@ -720,9 +736,16 @@ fun BaseShellScreen(
                                     androidx.compose.material3.Button(
                                         modifier = Modifier.weight(1f),
                                         onClick = {
-                                            historyMenuExpanded = false
-                                            shellViewModel.onCommandTextFieldChange(androidx.compose.ui.text.input.TextFieldValue("settings put global wifi_on 1"))
-                                            actionFabOnClick()
+                                            Thread {
+                                                try {
+                                                    val p = ProcessBuilder("sh", "-c", "settings put global wifi_on 1").start()
+                                                    p.waitFor()
+                                                } catch (e: Exception) {
+                                                    try {
+                                                        shellViewModel.runCommand("settings put global wifi_on 1")
+                                                    } catch (ex: Exception) {}
+                                                }
+                                            }.start()
                                         }
                                     ) {
                                         androidx.compose.material3.Text("Global Aç")
@@ -730,9 +753,16 @@ fun BaseShellScreen(
                                     androidx.compose.material3.Button(
                                         modifier = Modifier.weight(1f),
                                         onClick = {
-                                            historyMenuExpanded = false
-                                            shellViewModel.onCommandTextFieldChange(androidx.compose.ui.text.input.TextFieldValue("settings put global wifi_scan_always_enabled 1"))
-                                            actionFabOnClick()
+                                            Thread {
+                                                try {
+                                                    val p = ProcessBuilder("sh", "-c", "settings put global wifi_scan_always_enabled 1").start()
+                                                    p.waitFor()
+                                                } catch (e: Exception) {
+                                                    try {
+                                                        shellViewModel.runCommand("settings put global wifi_scan_always_enabled 1")
+                                                    } catch (ex: Exception) {}
+                                                }
+                                            }.start()
                                         }
                                     ) {
                                         androidx.compose.material3.Text("Tarama Aç")
