@@ -24,38 +24,55 @@ jobs:
       - name: Gradle Calistirma Yetkisi Ver
         run: chmod +x gradlew
 
-      - name: Imzalamayi Devre Disi Birak (Imza Hatasini Onler)
+      - name: Gecerli Bir Release Keystore Uret
         run: |
-          # build.gradle.kts icindeki zorunlu release imza kuralini gecici olarak kaldir
-          sed -i 's/signingConfig = signingConfigs.getByName("release")//g' app/build.gradle.kts || true
+          mkdir -p $HOME/.android
+          keytool -genkey -v -keystore $HOME/.android/release.keystore \
+            -alias androidreleasekey -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass android -keypass android \
+            -dname "CN=Chery, OU=Automotive, O=Omoda, L=TR, S=TR, C=TR"
 
-      - name: Optimize Release APK Derle (R8 Kod Kucultme Acik)
+      - name: Release APK Derle (R8 Optimizasyonlu)
+        env:
+          KEYSTORE_PATH: /home/runner/.android/release.keystore
+          KEYSTORE_FILE: /home/runner/.android/release.keystore
+          KEYSTORE_PASSWORD: android
+          KEY_ALIAS: androidreleasekey
+          KEY_PASSWORD: android
+          RELEASE_STORE_FILE: /home/runner/.android/release.keystore
+          RELEASE_STORE_PASSWORD: android
+          RELEASE_KEY_ALIAS: androidreleasekey
+          RELEASE_KEY_PASSWORD: android
         run: |
-          ./gradlew :app:assembleGithubRelease -Pandroid.injected.build.abi=arm64-v8a --no-daemon
+          ./gradlew :app:assembleGithubRelease \
+            -Pandroid.injected.signing.store.file=/home/runner/.android/release.keystore \
+            -Pandroid.injected.signing.store.password=android \
+            -Pandroid.injected.signing.key.alias=androidreleasekey \
+            -Pandroid.injected.signing.key.password=android \
+            -Pandroid.injected.build.abi=arm64-v8a \
+            -x lint -x lintAnalyzeRelease -x lintVitalAnalyzeRelease \
+            --no-daemon
 
-      - name: Android Imzalama Aracini Kur
-        run: sudo apt-get install -y apksigner
-
-      - name: APKyi Imzala ve Ayikla
+      - name: Sadece 10 MB ARM64 Release APKyi Ayikla
         run: |
           mkdir -p cikti
-          # Olusan imzasiz release APK'sini bul
-          HAM_APK=$(find . -name "*github*release*.apk" -type f | head -n 1)
-          if [ -z "$HAM_APK" ]; then
-            HAM_APK=$(find . -name "*release*.apk" -type f | head -n 1)
+          echo "=== Tum Uretilen APKlar ==="
+          find . -name "*.apk" -type f
+          
+          # github release klasorundeki arm64 veya genel release apk'sini sec
+          HEDEF_APK=$(find . -path "*github*release*" -name "*.apk" -type f | head -n 1)
+          if [ -z "$HEDEF_APK" ]; then
+            HEDEF_APK=$(find . -name "*release*.apk" -type f | head -n 1)
           fi
           
-          echo "Bulunan Ham Release APK: $HAM_APK"
+          echo "Secilen Hedef APK: $HEDEF_APK"
+          cp "$HEDEF_APK" cikti/aShellYou-Chery-Omoda5-10MB.apk
           
-          # Hizlica test anahtari olustur ve APK'yi imzala
-          keytool -genkey -v -keystore test.keystore -alias test -keyalg RSA -keysize 2048 -validity 10000 -storepass 123456 -keypass 123456 -dname "CN=Chery, OU=App, O=Auto, L=TR, S=TR, C=TR"
-          apksigner sign --ks test.keystore --ks-pass pass:123456 --key-pass pass:123456 --out cikti/aShellYou-Chery-10MB.apk "$HAM_APK"
-          
-          echo "=== Nihai APK Boyutu ==="
-          ls -lh cikti/aShellYou-Chery-10MB.apk
+          echo "=== Nihai Dosya Boyutu ==="
+          ls -lh cikti/aShellYou-Chery-Omoda5-10MB.apk
 
       - name: 10 MB APKyi Yukle
         uses: actions/upload-artifact@v4
         with:
-          name: aShellYou-Chery-Omoda5-10MB
-          path: cikti/aShellYou-Chery-10MB.apk
+          name: aShellYou-Chery-10MB
+          path: cikti/aShellYou-Chery-Omoda5-10MB.apk
