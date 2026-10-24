@@ -24,31 +24,38 @@ jobs:
       - name: Gradle Calistirma Yetkisi Ver
         run: chmod +x gradlew
 
-      - name: Sadece Chery Icin ARM64 Debug APK Derle
+      - name: Imzalamayi Devre Disi Birak (Imza Hatasini Onler)
         run: |
-          ./gradlew :app:assembleGithubDebug -Pandroid.injected.build.abi=arm64-v8a --no-daemon
+          # build.gradle.kts icindeki zorunlu release imza kuralini gecici olarak kaldir
+          sed -i 's/signingConfig = signingConfigs.getByName("release")//g' app/build.gradle.kts || true
 
-      - name: Uretilen APKyi Bul ve Tasi
+      - name: Optimize Release APK Derle (R8 Kod Kucultme Acik)
+        run: |
+          ./gradlew :app:assembleGithubRelease -Pandroid.injected.build.abi=arm64-v8a --no-daemon
+
+      - name: Android Imzalama Aracini Kur
+        run: sudo apt-get install -y apksigner
+
+      - name: APKyi Imzala ve Ayikla
         run: |
           mkdir -p cikti
-          # Projenin tamaminda olusan tum apk dosyalarini listele
-          echo "=== Uretilen Tum APK Dosyalari ==="
-          find . -name "*.apk" -type f
-          
-          # github-debug veya debug apk dosyasini sec (fdroid haric)
-          APK_DOSYASI=$(find . -name "*github*debug*.apk" -type f | head -n 1)
-          if [ -z "$APK_DOSYASI" ]; then
-            APK_DOSYASI=$(find . -name "*debug.apk" -type f | grep -v "fdroid" | head -n 1)
+          # Olusan imzasiz release APK'sini bul
+          HAM_APK=$(find . -name "*github*release*.apk" -type f | head -n 1)
+          if [ -z "$HAM_APK" ]; then
+            HAM_APK=$(find . -name "*release*.apk" -type f | head -n 1)
           fi
           
-          echo "Secilen APK: $APK_DOSYASI"
-          cp "$APK_DOSYASI" cikti/aShellYou-Chery-Omoda5.apk
+          echo "Bulunan Ham Release APK: $HAM_APK"
           
-          echo "=== Cikti Dosyasi Boyutu ==="
-          ls -lh cikti/aShellYou-Chery-Omoda5.apk
+          # Hizlica test anahtari olustur ve APK'yi imzala
+          keytool -genkey -v -keystore test.keystore -alias test -keyalg RSA -keysize 2048 -validity 10000 -storepass 123456 -keypass 123456 -dname "CN=Chery, OU=App, O=Auto, L=TR, S=TR, C=TR"
+          apksigner sign --ks test.keystore --ks-pass pass:123456 --key-pass pass:123456 --out cikti/aShellYou-Chery-10MB.apk "$HAM_APK"
+          
+          echo "=== Nihai APK Boyutu ==="
+          ls -lh cikti/aShellYou-Chery-10MB.apk
 
-      - name: Kucuk Boyutlu APKyi Yukle
+      - name: 10 MB APKyi Yukle
         uses: actions/upload-artifact@v4
         with:
-          name: aShellYou-Chery-Omoda5
-          path: cikti/aShellYou-Chery-Omoda5.apk
+          name: aShellYou-Chery-Omoda5-10MB
+          path: cikti/aShellYou-Chery-10MB.apk
